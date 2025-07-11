@@ -1,56 +1,53 @@
-console.log('Javascript is Running!');
-//Global list
-let tasks = [];
+const todoForm = document.getElementById('todo-form');
+const todoInput = document.getElementById('todo-input');
+const dateInput = document.getElementById('date-input');
+const todoList = document.getElementById('todo-list');
+const filterInput = document.getElementById('filter-input');
 
-// Function to add a new task
-function addTask(){
-    const taskInput = document.getElementById('task-input');
-    const dueDateInput = document.getElementById('due-date-input');
-}
+let todos = [];
 
-//Validate input
-if (taskInput.value === '') {
-    alert('Please enter a task');
+todoForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const task = todoInput.value.trim();
+  const date = dateInput.value;
+
+  if (!task || !date) {
+    alert('Please fill out both task and date!');
     return;
-} else {
-    //create a new task object
-    const newTask = {
-        task: taskInput.value,
-        dueDate: dueDateInput.value,
-        completed: false
-    };
+  }
 
-    //add the new task to the tasks array
-    tasks.push(newTask);
+  const todo = {
+    id: Date.now(),
+    task,
+    date
+  };
 
-    //clear the input fields
-    taskInput.value = '';
-    dueDateInput.value = '';
-    
-    //log the tasks array to the console
-    console.log('new task added:', newTask);
-}
-console.log('Adding task:', taskInput.value, 'Due Date:', dueDateInput.value);
+  todos.push(todo);
+  displayTodos(todos);
+  todoForm.reset();
+});
 
-function displayTasks() {
-    const taskList = document.querySelector('.todo-list');
-}
+function displayTodos(data) {
+  todoList.innerHTML = '';
 
-//function to delete all task
-function deleteAllTasks(){
-
+  data.forEach(todo => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      ${todo.task} - <small>${todo.date}</small>
+      <button class="delete-btn" onclick="deleteTodo(${todo.id})">Delete</button>
+    `;
+    todoList.appendChild(li);
+  });
 }
 
-//function to filter tasks
-function filterTasks() {
-    const filter = document.querySelector('.filter-tasks').value;
-    const tasks = document.querySelectorAll('.todo-item');
-    
-    tasks.forEach(task => {
-        if (filter === 'all' || task.classList.contains(filter)) {
-            task.style.display = 'flex';
-        } else {
-            task.style.display = 'none';
-        }
-    });
+function deleteTodo(id) {
+  todos = todos.filter(todo => todo.id !== id);
+  displayTodos(todos);
 }
+
+filterInput.addEventListener('input', function () {
+  const keyword = filterInput.value.toLowerCase();
+  const filtered = todos.filter(todo => todo.task.toLowerCase().includes(keyword));
+  displayTodos(filtered);
+});
